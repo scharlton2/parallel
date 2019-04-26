@@ -30,11 +30,11 @@ int main()
     threads += 1;
 
 #pragma omp for reduction(+ : sum)
-    for (int i = 1; i <= 1000; ++i)
+    for (int i = 0; i <= 1000; ++i)
       sum += i;
   }
 
-  std::cout << "using " << threads << " threads, sum(1:1000) = " << sum << std::endl;
+  std::cout << "using " << threads << " threads, sum(0:1000) = " << sum << std::endl;
 
   return 0;
 }
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
   MPI_Reduce(&sum, &allsum, 1, MPI_INTEGER, MPI_SUM, 0, MPI_COMM_WORLD);
 
   if (id == 0) {
-    std::cout << "using " << procs << " processes, sum(1:1000) = " << allsum << std::endl;
+    std::cout << "using " << procs << " processes, sum(0:1000) = " << allsum << std::endl;
   }
 
   MPI_Finalize();
