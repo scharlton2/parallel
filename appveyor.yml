@@ -1,7 +1,49 @@
+version: '{build}'
+branches:
+  only:
+  - master
+clone_folder: c:\projects\parallel
+image:
+- Visual Studio 2013
+configuration:
+- Release
+platform:
+- x64
 environment:
   access_token:
     secure: A9uxnM8l+sPtDq+VCfp+VQ==
+  matrix:
+  - arch: Win64
+  # - arch: #does not work, Release|x64 not a valid target
+matrix:
+  fast_finish: true
 
+# skip unsupported combinations
+init:
+- set arch=
+- if "%arch%"=="Win64" ( set arch= Win64)
+- echo %arch%
+- echo %APPVEYOR_BUILD_WORKER_IMAGE%
+- if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" ( set generator="Visual Studio 15 2017%arch%" )
+- if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" ( set generator="Visual Studio 14 2015%arch%" )
+- if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2013" ( set generator="Visual Studio 12 2013%arch%" )
+- echo %generator%
+
+before_build:
+- cmd: |-
+    mkdir _build
+    cd _build
+    cmake --version
+    cmake .. -G %generator%
+build:
+  project: c:\projects\parallel\_build\Project.sln
+  verbosity: minimal
+  parallel: true
+only_commits:
+  files:
+    - CMakeLists.txt
+    - appveyor.yml
+    - main.cxx
 on_success:
   - ps: echo "$env:access_token"
   - ps: Add-Content "$HOME\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
