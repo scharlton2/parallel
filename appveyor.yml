@@ -1,0 +1,8 @@
+environment:
+  access_token:
+    secure: A9uxnM8l+sPtDq+VCfp+VQ==
+
+on_success:
+  - ps: echo "$env:access_token"
+  - ps: Add-Content "$HOME\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+  - ps: cat "$HOME\.git-credentials"
