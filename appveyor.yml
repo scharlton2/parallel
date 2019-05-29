@@ -45,6 +45,26 @@ only_commits:
     - appveyor.yml
     - main.cxx
 on_success:
-  - ps: echo "$env:access_token"
-  - ps: Add-Content "$HOME\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
-  - ps: cat "$HOME\.git-credentials"
+  - ps: |
+      Set-Location \
+      Measure-Command { git clone https://github.com/i-RIC/online_update.git --single-branch }
+      Set-Location .\online_update
+      $v=(Select-String -Path dev_src\packages\gui.prepost\meta\package.xml -Pattern "(?<=<Version>)(.*)(?=</Version>)").Matches.Value -split "\."
+      $v[2] = 1 + $v[2]
+      $Env:VERSION = $v -join "."
+      $Env:RELEASE_DATE = $(Get-Date -Format o).Substring(0,10)
+      $Env:RELEASE = $Env:RELEASE_DATE -replace '-', '.'
+      $Env:CAPTION = "iRIC GUI " + $v[0] + "." + $v[1] + "." + $v[2]
+      $files=@('dev_src\packages\gui.prepost\data\definition.xml', `
+               'dev_src\packages\gui.prepost\meta\package.xml')
+      foreach ($file in $files) {
+        (Get-Content $file) | Foreach-Object {
+          $_ -replace "(?<=<Version>)(.*)(?=</Version>)",           "$Env:VERSION" `
+             -replace "`" version=`"([^`"]*)`"",                    "`" version=`"$Env:VERSION`"" `
+             -replace "(?<=<ReleaseDate>)(.*)(?=</ReleaseDate>)",   "$Env:RELEASE_DATE" `
+             -replace "release=`"([^`"]*)`"",                       "release=`"$Env:RELEASE`"" `
+             -replace "caption=`"([^`"]*)`"",                       "caption=`"$Env:CAPTION`"" `
+             -replace "github-sha1=`"([^`"]*)`"",                   "github-sha1=`"$Env:APPVEYOR_REPO_COMMIT`""
+        } | Set-Content $file
+      }
+      git diff
