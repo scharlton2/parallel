@@ -47,7 +47,7 @@ only_commits:
 on_success:
   - ps: |
       Set-Location \
-      Measure-Command { git clone https://github.com/i-RIC/online_update.git --single-branch }
+      git clone https://github.com/i-RIC/online_update.git --single-branch
       Set-Location .\online_update
       $v=(Select-String -Path dev_src\packages\gui.prepost\meta\package.xml -Pattern "(?<=<Version>)(.*)(?=</Version>)").Matches.Value -split "\."
       $v[2] = 1 + $v[2]
