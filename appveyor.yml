@@ -51,9 +51,11 @@ on_success:
       Set-Location .\online_update
       git checkout -qf master
       $v=(Select-String -Path dev_src\packages\gui.prepost\meta\package.xml -Pattern "(?<=<Version>)(.*)(?=</Version>)").Matches.Value -split "\."
-      $v[2] = 1 + $v[2]
+      $v[3] = 1 + $v[3] 
       $Env:VERSION = $v -join "."
-      $Env:RELEASE_DATE = $(Get-Date -Format o).Substring(0,10)
+      $tokyo_tz = [System.TimeZoneInfo]::FindSystemTimeZoneById("Tokyo Standard Time")
+      $tokyo_date = [System.TimeZoneInfo]::ConvertTimeFromUtc((Get-Date).ToUniversalTime(), $tokyo_tz)
+      $Env:RELEASE_DATE = $(Get-Date $tokyo_date -Format s).Substring(0,10)
       $Env:RELEASE = $Env:RELEASE_DATE -replace '-', '.'
       $Env:CAPTION = "iRIC GUI " + $v[0] + "." + $v[1] + "." + $v[2]
       $files=@('dev_src\packages\gui.prepost\data\definition.xml', `
