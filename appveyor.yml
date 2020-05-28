@@ -2,9 +2,13 @@ version: '{build}'
 branches:
   only:
   - master
+
 clone_folder: c:\projects\parallel
-build_cloud: IGSKZWHWLTCHARL
+
+build_cloud: IGSKZWHWLTCHARL Docker
+
 image: Windows
+
 configuration:
 - Release
 platform:
