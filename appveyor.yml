@@ -3,8 +3,8 @@ branches:
   only:
   - master
 clone_folder: c:\projects\parallel
-image:
-- Visual Studio 2013
+build_cloud: IGSKZWHWLTCHARL
+image: Windows
 configuration:
 - Release
 platform:
@@ -47,7 +47,7 @@ only_commits:
 on_success:
   - ps: |
       Set-Location \
-      git clone -q --branch=master https://github.com/i-RIC/online_update.git
+      git clone -q --branch=master --depth 1 https://github.com/i-RIC/online_update.git
       Set-Location .\online_update
       git checkout -qf master
       $v=(Select-String -Path dev_src\packages\gui.prepost\meta\package.xml -Pattern "(?<=<Version>)(.*)(?=</Version>)").Matches.Value -split "\."
